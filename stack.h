@@ -1,15 +1,17 @@
 #ifndef STACK_H
 #define STACK_H
 
+template <typename T>
 class Stack {
     unsigned capacity;
-    int* array;
+    T* array;
     unsigned size;
     public:
     Stack(unsigned capacity);
-    void push(int val);
-    void pop();
-    int peek() const;
+    ~Stack();
+    void push(T val);
+    int pop();
+    T peek() const;
     unsigned empty() const;
     unsigned full() const;
 };
