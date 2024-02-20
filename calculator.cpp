@@ -3,7 +3,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
-
+#include <cmath>
 // check if parenthesis, brackets, and curly are closed and matching
 short int checkClosed(std::string s);
 // check pair if true
@@ -18,7 +18,7 @@ double solvePost(std::string s);
 unsigned operatorToPriority(char c);
 
 int main() {
-    std::string testS = "(2 + 3 - 5 + 2 ^ 2)";
+    std::string testS = "(8-3)/(4+2)";
     switch(checkClosed(testS)){
         case(0):
         std::cout << "Closed bracket before start"<< std::endl;
@@ -29,14 +29,14 @@ int main() {
         return 0;
         break;
         case(-2):
-        std::cout << "unexpected characters"<< std::endl;
+        std::cout << "unexpected character"<< std::endl;
         return 0;
         break;
     }
     try {
         std::string post = inToPost(testS);
-        std::cout << post << std::endl;
-        std::cout << std::setprecision(3)<<solvePost(post) << std::endl;
+        std::cout << "Postfix: " <<post << std::endl;
+        std::cout << "Results: "<<std::setprecision(3)<<solvePost(post) << std::endl;
     }
     catch(int val){
         std::cout<<"Did not work" << std::endl;
@@ -174,19 +174,17 @@ unsigned operatorToPriority(char c){
     // lowest to higher
     switch(c){
         case('-'):
-        return 0;
         case('+'):
         return 1;
         case('%'):
         return 2;
         case('/'):
-        return 3;
         case('*'):
         return 4;
         case('^'):
         return 5;
         default:
-        return 100;
+        return 0;
     }
 }
 
@@ -225,31 +223,21 @@ std::string inToPost(std::string s){
             break;
             case(1):
             // operators
-            current = s[i];
-            try{
-                if (operatorToPriority(current) > operatorToPriority(operators.peek())){
-                    operators.push(current);
+            if (operators.empty()) operators.push(s[i]);
+            else if (operatorToPriority(s[i]) > operatorToPriority(operators.peek())) operators.push(s[i]);
+            else {
+                while (!operators.empty() && operatorToPriority(s[i]) <= operatorToPriority(operators.peek())){
+                    post += operators.peek();
+                    operators.pop();
                 }
-                else{
-                    while(operatorToPriority(current) >= operatorToPriority(operators.peek())){
-                        post += operators.peek();
-                        operators.pop();
-                        if (operators.empty()) break;
-                    }
-                    operators.push(current);
-                }
-            }
-            catch(int val){
-                operators.push(current);
+                operators.push(s[i]);
             }
             break;
         }
     }
-    try{
+    while(!operators.empty()){
         post += operators.peek();
-    }
-    catch(int val){
-        
+        operators.pop();
     }
     return post;
 }
